@@ -1,0 +1,305 @@
+.container {
+    height: 100vh;
+    width: 100%;
+}
+
+.mybox {
+    /* width:auto */
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.hidden-row {
+    display: none;
+}
+
+/* FROM NEW TABLE */
+body {
+    color: #404E67;
+    background: #F5F7FA;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.table-wrapper {
+    width: 100%;
+    margin: 30px auto;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+}
+
+.table-title {
+    width: 100%;
+    padding-bottom: 10px;
+    margin: 0 0 10px;
+}
+
+.table-title h2 {
+    margin: 6px 0 0;
+    font-size: 22px;
+}
+
+.table-title .add-new {
+    float: right;
+    height: 30px;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: none;
+    min-width: 100px;
+    border-radius: 50px;
+    line-height: 13px;
+
+}
+
+.table-title .add-new i {
+    margin-right: 4px;
+}
+
+table.table {
+    table-layout: fixed;
+}
+
+table.table tr th,
+table.table tr td {
+    border-color: #e9e9e9;
+}
+
+table.table th i {
+    font-size: 13px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+table.table th:last-child {
+    width: 100px;
+}
+
+table.table td a {
+    cursor: pointer;
+    display: inline-block;
+    margin: 0 5px;
+    min-width: 24px;
+}
+
+table.table td a.add {
+    color: #27C46B;
+}
+
+table.table td a.edit {
+    color: #FFC107;
+}
+
+table.table td a.delete {
+    color: #E34724;
+}
+
+table.table td i {
+    font-size: 19px;
+}
+
+table.table td a.add i {
+    font-size: 24px;
+    margin-right: -1px;
+    position: relative;
+    top: 3px;
+}
+
+table.table .form-control {
+    height: 32px;
+    line-height: 32px;
+    box-shadow: none;
+    border-radius: 2px;
+}
+
+table.table .form-control.error {
+    border-color: #f50000;
+}
+
+table.table td .add {
+    display: none;
+}
+
+.statcard {
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    background-color: #f8f9fa;
+    text-align: center;
+}
+
+.statcard-primary {
+    background-color: #1995AD;
+    color: #A1D6E2;
+}
+
+.statcard-success {
+    background-color: darkgreen;
+    color: lightblue;
+}
+
+
+.statcard-secondary {
+    background-color: #ACC8E5;
+    color: #112A46;
+}
+
+.statcard-danger {
+    background-color: #e61258;
+    color: lightblue;
+}
+
+.delta-positive {
+    color: green;
+}
+
+.delta-negative {
+    color: red;
+}
+
+
+
+/* Key Features Section */
+.features {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+
+.feature {
+    width: 30%;
+    min-width: 250px;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    transition: transform 0.3s ease;
+}
+
+.feature:hover {
+    transform: translateY(-10px);
+}
+
+.feature h3 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.feature p {
+    font-size: 16px;
+    color: #777;
+}
+
+
+h1 {
+    font-size: 36px;
+    color: #333;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+/* Subheading Styles */
+h2 {
+    font-size: 24px;
+    color: #666;
+    margin-bottom: 30px;
+    font-weight: normal;
+    line-height: 1.5;
+}
+
+/* Paragraph Text Styles */
+p {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 30px;
+    line-height: 1.8;
+}
+
+
+ul.bullet-points {
+    list-style-type: none;
+    /* Disable the default bullet points */
+    padding-left: 20px;
+    /* Adds some left padding to the list */
+}
+
+ul.bullet-points li {
+    font-size: 18px;
+    /* Adjust the font size */
+    color: #333;
+    /* Text color */
+    margin-bottom: 10px;
+    /* Spacing between list items */
+    position: relative;
+    /* To position the custom bullet */
+}
+
+
+
+.text-container {
+    max-width: 60%;                    /* Limit the width of the text container */
+  }
+  
+  .image-container {
+    max-width: 35%;
+    display: flex;
+    justify-content: center;           /* Center the image horizontally in its container */
+  }
+  
+  
+  
+  .solution-image {
+    border-radius: 15px !important; /* Adjust this value for more or less rounded corners */
+    width: 100%; /* Make the image 20% bigger (adjust as needed) */
+    height: auto; /* Maintain aspect ratio */
+    /* object-fit: cover; Ensure the image is well-scaled within its container */
+  }
+  
+ul.bullet-points li::before {
+    content: "\2022";
+    /* Unicode for bullet point */
+    color: #007bff;
+    /* Set the color of the bullets to blue */
+    font-size: 30px;
+    /* Increase the size of the bullet */
+    position: absolute;
+    /* Position the bullet */
+    left: -25px;
+    /* Adjust the left positioning */
+    top: 50%;
+    /* Vertically center the bullet */
+    transform: translateY(-50%);
+    /* Adjust vertical alignment */
+}
+
+
+.footer-container {
+    display: flex;
+    justify-content: space-between; /* Aligns items to the left and right */
+    align-items: center; /* Vertically aligns items in the center */
+    padding: 10px; /* Optional: Add padding for spacing */
+  }
+  
+  footer {
+    flex-grow: 1; /* Makes the footer text grow to take available space */
+    text-align: center; /* Centers the footer text */
+  }
+  
+  .social-links {
+    display: flex;
+    gap: 15px; /* Space between social links */
+  }
+  
+  .social-links a {
+    color: inherit; /* Make sure the icons inherit the default color */
+    text-decoration: none; /* Remove underline */
+  }
+  
+  .social-links a:hover {
+    color: #0077b5; /* Optional: Change color on hover */
+  }
+  

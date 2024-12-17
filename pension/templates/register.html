@@ -1,0 +1,84 @@
+{% extends "layout.html"%}
+{% block column_class %}
+    col-md-12
+{% endblock %}
+{% block content%}
+<div class="container-fluid d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="col-md-6">
+    <form method="POST" action="/register">
+        {{form.hidden_tag()}}
+        <fieldset class="form-group ">
+            <legend class="border-bottom  mb-4">Registration Form</legend>
+            <div class="form-group mb-4">
+                {{ form.username.label(class="form-control-label")}}
+                {% if form.username.errors %}
+                {{ form.username(class="form-control form-control-md is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.username.errors %}
+                    <span> {{ error }} </span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    {{ form.username(class="form-control form-control-md")}}
+                {% endif %}
+            </div>
+            <div class="form-group mb-4">
+                {{ form.email.label(class="form-control-label")}}
+                {% if form.email.errors %}
+                {{ form.email(class="form-control form-control-md is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.email.errors %}
+                    <span> {{ error }} </span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    {{ form.email(class="form-control form-control-md")}}
+                {% endif %}
+            </div>
+            <div class="form-group mb-4">
+                {{ form.contact.label(class="form-control-label")}}
+                {% if form.contact.errors %}
+                {{ form.contact(class="form-control form-control-md is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.contact.errors %}
+                    <span> {{ error }} </span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.contact(class="form-control form-control-md")}}
+                {% endif %}
+            </div>
+
+            <div class="form-group mb-4">
+                {{ form.password.label(class="form-control-label")}}
+                {% if form.password.errors %}
+                {{ form.password(class="form-control form-control-md is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.password.errors %}
+                    <span> {{ error }} </span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    {{ form.password(class="form-control form-control-md")}}
+                {% endif %}
+            </div>
+            <div class="form-group mb-4">
+                {{ form.confirmpassword.label(class="form-control-label")}}
+                {% if form.confirmpassword.errors %}
+                {{ form.confirmpassword(class="form-control form-control-md is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.confirmpassword.errors %}
+                    <span> {{ error }} </span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    {{ form.confirmpassword(class="form-control form-control-md")}}
+                {% endif %}
+            </div>
+        </fieldset>
+        <div class="form-group mb-4">
+            {{ form.submit(class="btn btn-outline-info")}}
+        </div>
+    </form>
+</div>
+{% endblock content %}

@@ -1,0 +1,43 @@
+# Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment directories
+venv/
+env/
+Scripts/
+flask_session/
+Lib/
+Include/
+etc/
+
+
+
+# Flask instance folder
+instance/
+
+# Environment variable files
+.env
+.cfg
+# SQLite database files
+*.db
+*.sqlite
+
+
+style2.css
+# Log files
+*.log
+
+# OS generated files (e.g., macOS Finder, Windows Thumbs.db)
+.DS_Store
+Thumbs.db
+
+# IDE or text editor settings
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# PyCharm
+*.iml

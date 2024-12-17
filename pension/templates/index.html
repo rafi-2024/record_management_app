@@ -1,0 +1,51 @@
+{% extends "layout.html"%}
+{% block column_class %}col-md-12{% endblock %}
+
+{% block content%}
+<div class="container ">
+  <h1 class="text-primary">Welcome to Effortless Document Management</h1>
+  <div class="d-flex flex-row mt-1 justify-content-between">
+    <div class="text-container">
+      <h2 class="text-success">Say goodbye to manual paperwork</h2>
+      <p class="text-danger">Are you tired of</p>
+      <ul class="bullet-points">
+        <li>Wasting time sifting through piles of paper ?</li>
+        <li>Searching for that one elusive document ?</li>
+        <li>Struggling to keep track of hard copies ?</li>
+        <li>Feeling frustrated when you can't find what you need fast ?</li>
+      </ul>
+      <p class="text-primary">Don't You think It's time for a smarter solution!</p>
+    </div>
+    <div class="image-container feature">
+      <img src="/static/pileimage.jpg" alt="Document Management" class="solution-image">
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="feature">
+      <h3 class="text-primary">Quick and Easy Search</h3>
+      <p class="text-success">Find any document in seconds with intuitive search tools. No more digging through endless
+        files.</p>
+    </div>
+    <div class="d-flex flex-row justify-content-between align-items-center ">
+      <a href="{{url_for('users.register')}}" class="btn btn-primary">Try It Now</a>
+    </div>
+    <div class="feature">
+      <h3 class="text-primary">Paperless Workflow</h3>
+      <p class="text-success">Scan, upload, and access documents from anywhere—no more physical clutter.</p>
+    </div>
+  </div>
+  <div class="footer-container">
+    <footer>&copy; 2024 Effortless Document Management</footer>
+    <div class="social-links">
+      <a href="https://linkedin.com/in/rafi-pythonista" target="_blank">
+        <i class="fa-brands fa-linkedin fa-lg"></i>
+      </a>
+      <a href="mailto: rafi.freelancer9@gmail.com" target="_blank">
+        <i class="fa-solid fa-envelope fa-lg"></i>
+      </a>
+    </div>
+  </div>
+  
+
+  {% endblock content %}

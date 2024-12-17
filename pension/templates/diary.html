@@ -1,0 +1,466 @@
+{% extends "layout.html"%}
+{% block column_class %}
+    col-md-12
+{% endblock %}
+{% block content%}
+
+<div class="container container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Diary Register </h2>
+        </div>
+        <div class="col-md-4">
+            <button type="button" class="btn btn-info add-new" data-bs-target="#newdiarymodal" data-bs-toggle="modal"
+                action="url_for('diaries.new')"><i class="fa fa-plus"></i>
+                Add New</button>
+        </div>
+    </div>
+    <div class="row">
+        {% if data %}
+        <div class="table-responsive">
+            <table id="diaryview">
+                <caption>List of Diary Numbers</caption>
+                <thead>
+                    <tr>
+                        <th>Diary No</th>
+                        <th>Diary Date</th>
+                        <th>Reference No</th>
+                        <th>Reference Date</th>
+                        <th>Subject</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in data %}
+                    <tr>
+                        <td>{{ item.id }} <button
+                            class="btn btn-sm btn-info toggle-references" data-itemid="{{ item.id }}">+</button></td>
+                        <td>{{ item.diary_date.strftime('%d-%m-%Y') }} </td>
+                        <td>{{ item.reference_no }}</td>
+                        <td>{{ item.reference_date.strftime('%d-%m-%Y') }}</td>
+                        <td>{{ item.subject }}</td>
+                        <td class="btn-group">
+                            <!-- Update / edit Button trigger modal -->
+                            <button class="btn btn-info edit" title="Edit" data-item-branch="{{item.diary_date}}"
+                                data-item-id="{{item.id}}" data-item-date="{{item.reference_date}}"
+                                data-item-subject="{{item.subject}}" data-item-diary="{{item.reference_no}}"
+                                data-toggle="modal" data-target="#updateDiaryModal"><i
+                                    class="fa fa-pencil"></i></button>
+                            <!-- Delte Button trigger modal -->
+                            <button class="btn btn-danger delete_diary" data-item-id="{{ item.id }}" data-toggle="modal"
+                                data-target="#deletediaryModal" title="Delete">
+                                <i class="fa fa-trash "></i>
+                            </button>
+                            {% if not item.file_ref %}
+                            <button class="btn btn-secondary upload-diary" data-item-id="{{ item.id }}"
+                                data-toggle="modal" data-target="#upload_diary" title="Upload File">
+                                <i class="fa fa-upload "></i>
+                            </button>
+                            {%else%}
+                            <a href="{{url_for('diaries.view_file', name= item.file_ref.file_name )}}"
+                                class="btn btn-primary view-diary" data-item-id="{{ item.file_ref.file_name }}"
+                                title="View File">
+                                <i class="fa fa-file fa-lg"></i>
+                            </a>
+                            {%endif%}
+                            <button class="btn btn-info add-refs" data-item-id="{{ item.id }}" data-toggle="modal"
+                                data-target="#addRefsModal" title="Add References">
+                                <i class="fa fa-paperclip fa-lg"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% endif %}
+    </div>
+
+
+    <!-- New Diary Modal -->
+    <div class="modal" id="newdiarymodal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form method="POST" id="newdiaryform" action="{{ url_for('diaries.new') }}">
+                        {{form.hidden_tag()}}
+
+                        <legend class="border-bottom ml-4 mb-4">Add New Diary</legend>
+                        <div class="form-group mb-4">
+                            {% if form.reference.errors %}
+                            {{ form.reference(class="form-control form-control-md is-invalid", placeholder="Reference
+                            Number")}}
+                            <div class="invalid-feedback">
+                                {% for error in form.reference.errors %}
+                                <span> {{ error }} </span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.reference(class="form-control form-control-md", placeholder="Reference Number")}}
+                            {% endif %}
+                        </div>
+                        <div class="form-group mb-4">
+                            {% if form.ref_date.errors %}
+                            {{ form.ref_date(class="form-control form-control-md is-invalid",size=10,
+                            placeholder="Reference Date", maxlength=60)}}
+                            <div class="invalid-feedback">
+                                {% for error in form.ref_date.errors %}
+                                <span> {{ error }} </span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.ref_date(class="form-control form-control-md", maxlength=60 , placeholder="Reference
+                            Date")}}
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-4">
+                            {% if form.subject.errors %}
+                            {{ form.subject(class="form-control form-control-md is-invalid",size=10,
+                            placeholder="Subject", maxlength=60)}}
+                            <div class="invalid-feedback">
+                                {% for error in form.subject.errors %}
+                                <span> {{ error }} </span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.subject(class="form-control form-control-md", maxlength=60 ,
+                            placeholder="Subject")}}
+                            {% endif %}
+                        </div>
+                        <div class="form-group mb-4">
+                            {% if form.diary_id.errors %}
+                            {{ form.diary_id(class="form-control form-control-md is-invalid", min=1,
+                            placeholder="Previous Diary Number")}}
+                            <div class="invalid-feedback">
+                                {% for error in form.diary_id.errors %}
+                                <span> {{ error }} </span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form.diary_id(class="form-control form-control-md", min=1, placeholder="Previous Diary
+                            Number")}}
+                            {% endif %}
+                        </div>
+
+                        <div class="row mx-5 my-2">
+                            {{ form.submit(class="btn btn-info")}}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deletediaryModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <legend class="border-bottom ml-4 mb-4">Delete Diary</legend>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete item with ID <span id="modal-item-id"></span>?
+                </div>
+                <div class="modal-footer">
+                    <form id="deleteDiaryForm" action="{{url_for('diaries.delete_item')}}" method="POST">
+                        {{form.hidden_tag()}}
+                        <input type="hidden" name="item_id" id="delete-item-id">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- New Update Diary Modal -->
+    <div class="modal" id="updateDiaryModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-body">
+                        <legend class="border-bottom ml-4 mb-4">Update Diary</legend>
+                        Update item with ID <span style="font-weight: 600;" id="update-modal-item-id"></span>?
+                    </div>
+                    <form method="POST" id="updateDiaryForm" action="{{ url_for('diaries.update_diary') }}">
+                        {{form.hidden_tag()}}
+                        <div class="row mx-5 my-2">
+                            {% if ref_form.ref_id.errors %}
+                            {{ ref_form.ref_id.label(class="form-control-label")}}
+                            {{ ref_form.ref_id(class="form-control form-control-md is-invalid", placeholder="Reference
+                            ID", id="ref_form_id")}}
+                            <div class="invalid-feedback">
+                                {% for error in ref_form.ref_id.errors %}
+                                <span> {{ error }} </span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ ref_form.ref_id.label(class="form-control-label")}}
+                            {{ ref_form.ref_id(class="form-control form-control-md",
+                            placeholder="Reference ID", id="ref_form_id")}}
+                            {% endif %}
+                        </div>
+                        <div class="row mx-5 my-2">
+                            {% if ref_form.reference.errors %}
+                            {{ ref_form.reference.label(class="form-control-label")}}
+                            {{ ref_form.reference(class="form-control form-control-md is-invalid",
+                            placeholder="Reference Number", id="ref_form_ref_no")}}
+                            <div class="invalid-feedback">
+                                {% for error in ref_form.reference.errors %}
+                                <span> {{ error }} </span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ ref_form.reference.label(class="form-control-label")}}
+                            {{ ref_form.reference(class="form-control form-control-md",
+                            placeholder="Reference Number", id="ref_form_ref_no")}}
+                            {% endif %}
+                        </div>
+                        <div class="row mx-5 my-2">
+                            {% if ref_form.ref_date.errors %}
+                            {{ ref_form.ref_date.label(class="form-control-label")}}
+                            {{ ref_form.ref_date(class="form-control form-control-md is-invalid", placeholder="Reference
+                            Date", id="ref_form_ref_date")}}
+                            <div class="invalid-feedback">
+                                {% for error in ref_form.ref_date.errors %}
+                                <span> {{ error }} </span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ ref_form.ref_date.label(class="form-control-label")}}
+                            {{ ref_form.ref_date(class="form-control form-control-md",
+                            placeholder="Reference Date", id="ref_form_ref_date")}}
+                            {% endif %}
+                        </div>
+                        <div class="row mx-5 my-2">
+                            {% if ref_form.subject.errors %}
+                            {{ ref_form.subject.label(class="form-control-label")}}
+                            {{ ref_form.subject(class="form-control form-control-md is-invalid", placeholder="Subject",
+                            id="ref_form_subject")}}
+                            <div class="invalid-feedback">
+                                {% for error in ref_form.subject.errors %}
+                                <span> {{ error }} </span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ ref_form.subject.label(class="form-control-label")}}
+                            {{ ref_form.subject(class="form-control form-control-md",
+                            placeholder="Subject ", id="ref_form_subject")}}
+                            {% endif %}
+                        </div>
+                        <div class="row mx-5 my-2">
+                            {{ref_form.submit(class="btn btn-outline-info")}}
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">
+                                Close
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <!-- ADD DIARY REFERENCES Modal -->
+    <div class="modal" id="addRefsModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-body">
+                        <legend class="border-bottom ml-4 mb-4">Add New Reference to Existing Diaries</legend>
+                        Add Diary References to Diary Number <span style="font-weight: 600;"
+                            id="addref-modal-item-id"></span>?
+                    </div>
+                    <form method="POST" id="addrefform" action="{{ url_for('diaries.add_diary_refs') }}">
+                        {{form.hidden_tag()}}
+                        <div class="row mx-5 my-2">
+                            {% if ref_form.ref_id.errors %}
+                            {{ ref_form.ref_id.label(class="form-control-label")}}
+                            {{ ref_form.ref_id(class="form-control form-control-md is-invalid", placeholder="Reference
+                            ID", id="AddRefId")}}
+                            <input type="hidden" name="ref_id">
+                            <div class="invalid-feedback">
+                                {% for error in ref_form.ref_id.errors %}
+                                <span> {{ error }} </span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ ref_form.ref_id.label(class="form-control-label")}}
+                            {{ ref_form.ref_id(class="form-control form-control-md",
+                            placeholder="Reference ID", id="AddRefId")}}
+                            <input type="hidden" name="ref_id">
+                            {% endif %}
+                        </div>
+                        <div class="row mx-5 my-2">
+                            {% if ref_form.reference.errors %}
+                            {{ ref_form.reference.label(class="form-control-label")}}
+                            {{ ref_form.reference(class="form-control form-control-md is-invalid",
+                            placeholder="Reference Number", id="addRefReference")}}
+                            <div class="invalid-feedback">
+                                {% for error in ref_form.reference.errors %}
+                                <span> {{ error }} </span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ ref_form.reference.label(class="form-control-label")}}
+                            {{ ref_form.reference(class="form-control form-control-md",
+                            placeholder="Reference Number", id="addRefReference")}}
+                            {% endif %}
+                        </div>
+                        <div class="row mx-5 my-2">
+                            {% if ref_form.ref_date.errors %}
+                            {{ ref_form.ref_date.label(class="form-control-label")}}
+                            {{ ref_form.ref_date(class="form-control form-control-md is-invalid", placeholder="Reference
+                            Date", id="AddRefDate")}}
+                            <div class="invalid-feedback">
+                                {% for error in ref_form.ref_date.errors %}
+                                <span> {{ error }} </span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ ref_form.ref_date.label(class="form-control-label")}}
+                            {{ ref_form.ref_date(class="form-control form-control-md", placeholder="Reference Date",
+                            id="AddRefDate")}}
+                            {% endif %}
+                        </div>
+                        <div class="row mx-5 my-2">
+                            {% if ref_form.subject.errors %}
+                            {{ ref_form.subject.label(class="form-control-label")}}
+                            {{ ref_form.subject(class="form-control form-control-md is-invalid", placeholder="Subject",
+                            id="AddRefSubject")}}
+                            <div class="invalid-feedback">
+                                {% for error in ref_form.subject.errors %}
+                                <span> {{ error }} </span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ ref_form.subject.label(class="form-control-label")}}
+                            {{ ref_form.subject(class="form-control form-control-md",
+                            placeholder="Subject ", id="AddRefSubject")}}
+                            {% endif %}
+                        </div>
+                        <div class="row mx-5 my-2">
+                            {{ref_form.submit(class="btn btn-outline-info")}}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD UPLOAD Modal -->
+    <div class="modal" id="upload_diary" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-body">
+                        <legend class="border-bottom ml-4 mb-4">UPLOAD FILE</legend>
+                    </div>
+                    <form method="POST" id="upload-diary" enctype="multipart/form-data"
+                        action="{{ url_for('diaries.upload') }}">
+                        {{form.hidden_tag()}}
+                        <div class="mb-3">
+                            <input type="input" id="uploadid" name="uploadid">
+                            <input class="form-control" type="file" id="file" name="file">
+                            <input type="submit" value="Upload">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var DiaryTable = $('#diaryview').DataTable(); //DATATABLE VIEW
+
+            $('#deletediaryModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var itemId = button.data('item-id'); // Extract item ID from data- attribute
+            // Update the modal content
+            $('#modal-item-id').text(itemId);
+            $('#delete-item-id').val(itemId);
+
+        });
+
+        // Show update Modal modal and set item ID
+        $('#updateDiaryModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var itemId = button.data('item-id'); // Extract item ID from data- attribute
+            $('#update-modal-item-id').text(itemId);
+            var diary_date = button.data('item-date')
+            var subject = button.data('item-subject')
+            var ref_no = button.data('item-diary')
+
+            // // Update the modal content
+            // $('#modal-item-id').text(itemId);
+            $('#ref_form_id').val(itemId);
+            $('#ref_form_id').prop('disabled', true);
+            $('#ref_form_ref_no').val(ref_no); // Set reference Number in form field
+            $('#ref_form_subject').val(subject); // Set subject in form field
+            $('#ref_form_ref_date').val(diary_date); // Set date in form field
+        });
+
+        // Show upload modal and set item ID
+        $('#upload_diary').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var itemId = button.data('item-id'); // Extract item ID from data- attribute
+            $('#uploadid').val(itemId);
+        });
+        
+        document.querySelector("#addRefsModal").addEventListener("submit", function (event) {
+            // event.preventDefault();
+            var refId = document.getElementById("AddRefId").value;
+        });
+        // Show Addref modal and set item ID
+        $('#addRefsModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var itemId = button.data('item-id'); // Extract item ID from data- attribute
+            $('#addref-modal-item-id').text(itemId);
+
+            var refs_id = document.getElementsByName("ref_id")[2];
+            
+            if (refs_id)
+                refs_id.value = itemId;
+            // // Update the modal content
+            $('#AddRefId').val(itemId);
+            $('#AddRefId').prop('disabled', true);
+            var addrefid = document.getElementById('AddRefId').value;
+
+        });
+
+
+        let toggleButtons = document.querySelectorAll('.toggle-references');
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                let itemID = button.dataset.itemid;
+                let row = document.getElementById('references-' + itemID);
+                if (row.style.display === "none") {
+                    button.innerHTML = "-";
+                    row.style.display = "table-row";
+                } else {
+                    row.style.display = "none";
+                    button.innerHTML = "+";
+                }
+            });
+        });
+    });
+    </script>
+
+
+    {% endblock content %}

@@ -1,0 +1,422 @@
+{% extends "layout.html"%}
+{% block column_class %}
+    col-md-12
+{% endblock %}
+
+{% block content%}
+
+<div class="container container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Dispatch Register </h2>
+        </div>
+        <div class="col-md-4">
+            <button type="button" class="btn btn-info add-new" data-bs-target="#issuemodal" data-bs-toggle="modal"
+                action="url_for('issues.new')"><i class="fa fa-plus"></i>
+                Add New</button>
+        </div>
+    </div>
+    <div class="row">
+        {% if data %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <caption>List of Despatch Numbers</caption>
+                <thead>
+                    <tr>
+                        <th class="col-md-2" scope="Col">Despatch No</th>
+                        <th class="col-md-2" scope="Col">Despatch Date</th>
+                        <th class="col-md-4" scope="col">Subject</th>
+                        <th class="col-md-2" scope="Col">Reference No</th>
+                        <th class="col-md-2" scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in data %}
+                    <td>{{ item.id }}{{ item.branch_prefix }} </td>
+                    <td>{{ item.despatch_date.strftime('%d-%m-%Y') }} </td>
+                    <td>{{ item.subject }}</td>
+                    <td>{{ item.diary_id }}</td>
+                    <td class="btn-group">
+                        <!-- Update / edit Button trigger modal -->
+                        <button class="btn btn-info edit" title="Edit" data-item-branch="{{item.branch_prefix}}" data-item-id="{{item.id}}"
+                            data-item-date="{{item.despatch_date}}" data-item-subject="{{item.subject}}"
+                            data-item-diary="{{item.diary_id}}" data-toggle="modal" data-target="#updateissueModal"><i
+                                class="fa fa-pencil fa-lg"></i></button>
+                        <!-- Delte Button trigger modal -->
+                        <button class="btn btn-danger delete_issue" data-item-id="{{ item.id }}" data-toggle="modal"
+                            data-target="#deleteModal" title="Delete">
+                            <i class="fa fa-trash fa-lg"></i>
+                        </button>
+                        {% if not item.despatch_file_ref %}
+                            <button class="btn btn-secondary upload-issue" data-item-id="{{ item.id }}"
+                                data-toggle="modal" data-target="#upload_issue" title="Upload File">
+                                <i class="fa fa-upload fa-lg"></i>
+                            </button>
+                            {%else%}
+                            <a href="{{url_for('issues.view_file', name= item.despatch_file_ref.file_name )}}"
+                                class="btn btn-primary view-diary" data-item-id="{{ item.despatch_file_ref.file_name }}"
+                                title="View File">
+                                <i class="fa fa-file fa-lg"></i>
+                            </a>
+                            {%endif%}
+                            <button class="btn btn-info add-refs2" data-item-id="{{ item.id }}" data-toggle="modal"
+                            data-target="#addRefsModal2" title="Add References">
+                            <i class="fa fa-paperclip fa-lg"></i>
+                        </button>
+                    </td>
+                    </tr>
+                    {% if item.diary_references %}
+                    <tr class="reference-row" id="references-{{ item.id }}" style="display: none;">
+                        <td colspan="7">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Reference No</th>
+                                        <th>Reference Date</th>
+                                        <th>Subject</th>
+                                        <th>Diary Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ref in item.diary_references %}
+                                    <tr>
+                                        <td>{{ ref.reference_no }}</td>
+                                        <td>{{ ref.reference_date.strftime('%d-%m-%Y') }}</td>
+                                        <td>{{ ref.subject }}</td>
+                                        <td>{{ ref.diary_date }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="container container-fluid">
+            <h3>Sorry! No Data is available to display.</h3>
+            <p>Want to insert a new record into the diary? Please click the link <a
+                    class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover"
+                    href="{{url_for('diaries.new')}}">
+                    Diary
+                </a></p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- New Issue Modal -->
+<div class="modal" id="issuemodal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('issues.new') }}">
+                    {{form.hidden_tag()}}
+                    <legend class="border-bottom ml-4 mb-4">Add New Despatch</legend>
+                    <div class="row mx-5 my-2">
+                        {% if form.branch.errors %}
+                        {{ form.branch(class="form-control form-control-md is-invalid",size=10, minlength=5,
+                        maxlength=20,
+                        placeholder="Branch" )}}
+                        <div class="invalid-feedback">
+                            {% for error in form.branch.errors %}
+                            <span> {{ error }} </span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.branch(class="form-control form-control-md",size=10, minlength=5, maxlength=20,
+                        placeholder="Branch")}}
+                        {% endif %}
+                    </div>
+                    <div class="row mx-5 my-2">
+
+                        {% if form.issue_date.errors %}
+                        {{ form.issue_date(class="form-control form-control-md is-invalid",size=10, maxlength=60,
+                        placeholder="Issue
+                        Date")}}
+                        <div class="invalid-feedback">
+                            {% for error in form.issue_date.errors %}
+                            <span> {{ error }} </span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.issue_date(class="form-control form-control-md", maxlength=60, placeholder ="Issue
+                        Date")}}
+                        {% endif %}
+                    </div>
+                    <div class="row mx-5 my-2">
+                        {% if form.subject.errors %}
+                        {{ form.subject(class="form-control form-control-md is-invalid",size=10, maxlength=60,
+                        placeholder="Subject")}}
+                        <div class="invalid-feedback">
+                            {% for error in form.subject.errors %}
+                            <span> {{ error }} </span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.subject(class="form-control form-control-md", maxlength=60, placeholder="Subject")}}
+                        {% endif %}
+                    </div>
+                    <div class="row mx-5 my-2">
+                        {% if form.diary_id.errors %}
+                        {{ form.diary_id(class="form-control form-control-md is-invalid", placeholder="Diary
+                        Reference" )}}
+                        <div class="invalid-feedback">
+                            {% for error in form.diary_id.errors %}
+                            <span> {{ error }} </span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+
+                        {{ form.diary_id(class="form-control form-control-md", placeholder="Diary Reference")}}
+                        {% endif %}
+                    </div>
+                    <div class="row mx-5 my-2">
+                        {{form.submit(class="btn btn-outline-info")}}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Update ISSUE Modal -->
+<div class="modal" id="updateissueModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Despatch </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body">
+                    UPDATE item with ID <span id="modal-item-id"></span>?
+                </div>
+                <form method="POST" id="updateissueform" action="{{ url_for('issues.update') }}">
+                    {{form.hidden_tag()}}
+                    <input type="hidden" name="item_id" id="update-item-id">
+                    <div class="row mx-5 my-2">
+
+                        {% if form.branch.errors %}
+                        {{ form.branch(class="form-control form-control-md is-invalid",size=10, minlength=5,
+                        maxlength=20,
+                        placeholder="Branch", id="ubranch")}}
+                        <div class="invalid-feedback">
+                            {% for error in form.branch.errors %}
+                            <span> {{ error }} </span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.branch(class="form-control form-control-md",size=10, minlength=5, maxlength=20,
+                        placeholder="Branch", id="ubranch")}}
+                        {% endif %}
+                    </div>
+                    <div class="row mx-5 my-2">
+
+                        {% if form.issue_date.errors %}
+                        {{ form.issue_date(class="form-control form-control-md is-invalid",size=10, maxlength=60,
+                        placeholder="Issue
+                        Date", id="udate")}}
+                        <div class="invalid-feedback">
+                            {% for error in form.issue_date.errors %}
+                            <span> {{ error }} </span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.issue_date(class="form-control form-control-md", maxlength=60, placeholder ="Issue
+                        Date", id="udate")}}
+                        {% endif %}
+                    </div>
+                    <div class="row mx-5 my-2">
+                        {% if form.subject.errors %}
+                        {{ form.subject(class="form-control form-control-md is-invalid",size=10, maxlength=60,
+                        placeholder="Subject", id="usubject")}}
+                        <div class="invalid-feedback">
+                            {% for error in form.subject.errors %}
+                            <span> {{ error }} </span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.subject(class="form-control form-control-md", maxlength=60, placeholder="Subject", id="usubject")}}
+                        {% endif %}
+                    </div>
+                    <div class="row mx-5 my-2">
+                        {% if form.diary_id.errors %}
+                        {{ form.diary_id(class="form-control form-control-md is-invalid", placeholder="Diary
+                        Reference", id="udiary" )}}
+                        <div class="invalid-feedback">
+                            {% for error in form.diary_id.errors %}
+                            <span> {{ error }} </span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+
+                        {{ form.diary_id(class="form-control form-control-md", placeholder="Diary Reference", id="udiary")}}
+                        {% endif %}
+                    </div>
+                    <div class="row mx-5 my-2">
+                        {{form.submit(class="btn btn-outline-info")}}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Item</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete item with ID <span id="modal-item-id"></span>?
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" action="{{url_for('issues.delete')}}" method="POST">
+                    {{form.hidden_tag()}}
+                    <input type="hidden" name="item_id" id="delete-item-id">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <!-- ADD DIARY REFERENCES Modal -->
+    <div class="modal" id="addRefsModal2" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-body">
+                        <legend class="border-bottom ml-4 mb-4">Add New Reference to Existing Diaries</legend>
+                        Add Diary References to Despatch Number <span style="font-weight: 600;"
+                            id="addref-modal-item-id"></span>?
+                    </div>
+                    <form method="POST" id="addrefform" action="{{ url_for('issues.add_diary_refs') }}">
+                        {{form.hidden_tag()}}
+                        {% for field in form %}
+                        {% if field.name != 'csrf_token' and field.name != "submit" %}
+                        <div class="row mx-5 my-2">
+                            <label for="{{ field.id }}">{{ field.label }}</label>
+                            {% if field.name == 'diary_id' %}
+                            {{ field(class="form-control form-control-md", placeholder ="Diary Number", id=field.id) }}
+                            {%else%}
+                            {{ field(class="form-control form-control-md", maxlength=60, placeholder =field.name, id=field.id) }}
+                            {%endif%}
+                            {% if field.errors %}
+                                <ul>
+                                    {% for error in field.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                        {%endif%}
+                        {% endfor %}
+                            
+                        <div class="row mx-5 my-2">
+                            {{form.submit(class="btn btn-outline-info")}}
+                        </div>
+                    </form>
+                </div></div></div></div>
+
+                <!-- ADD UPLOAD ISSUE Modal -->
+    <div class="modal" id="upload_issue" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-body">
+                        <legend class="border-bottom ml-4 mb-4">UPLOAD FILE</legend>
+                    </div>
+                    <form method="POST" id="upload-issue" enctype="multipart/form-data"
+                        action="{{ url_for('issues.upload') }}">
+                        {{form.hidden_tag()}}
+                        <div class="mb-3">
+                            <input type="input" id="uploadid" name="uploadid">
+                            <input class="form-control" type="file" id="file" name="file">
+                            <input type="submit" value="Upload">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+                
+
+<script>
+    $(document).ready(function () {
+        // Show delete modal and set item ID
+        $('#deleteModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var itemId = button.data('item-id'); // Extract item ID from data- attribute
+
+            // Update the modal content
+            $('#modal-item-id').text(itemId);
+            $('#delete-item-id').val(itemId);
+
+        });
+
+        // Show delete modal and set item ID
+        $('#updateissueModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var itemId = button.data('item-id'); // Extract item ID from data- attribute
+            var branch = button.data('item-branch')
+            var subject = button.data('item-subject')
+            var date = button.data('item-date')
+            var diaryId = button.data('item-diary')
+            var form = document.getElementById("#updateissueform")
+            // Update the modal content
+            $('#modal-item-id').text(itemId);
+            $('#update-item-id').val(itemId);
+            $('#ubranch').val(branch); // Set branch in form field
+            $('#usubject').val(subject); // Set subject in form field
+            $('#udate').val(date); // Set date in form field
+            $('#udiary').val(diaryId); // Set diary ID in form field
+        });
+
+        // this code needs corrections
+        // upload issue modal 
+        $('#upload_issue').on('show.bs.modal', function (event) {
+            console.log('Modal is being shown');
+
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var itemId = button.data('item-id'); // Extract item ID from data- attribute
+            // $('#uploadid').val(itemId);
+            console.log('Item ID:', itemId);
+            $('#uploadid').val(itemId);
+
+        });
+        // Show Addref modal and set item ID
+        $('#addRefsModal2').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var itemId = button.data('item-id'); // Extract item ID from data- attribute
+            $('#addref-modal-item-id').text(itemId);
+            var refs_id = document.getElementsByName("ref_id")[1];
+            if (refs_id)
+                refs_id.value = itemId;
+            // // Update the modal content
+            $('#AddRefId').val(itemId);
+            $('#AddRefId').prop('disabled', true);
+
+        });
+    });
+</script>
+{% endblock content %}
